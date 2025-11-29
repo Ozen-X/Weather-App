@@ -1,51 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="./images/Logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wather App</title>
+    <title>Modern Weather App</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Tailwind CSS for Modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
+<body class="text-white p-4 flex justify-center items-start pt-10">
 
-<body>
+    <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 md:p-10 relative overflow-hidden">
+        
+        <!-- Decoration Circles -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
 
-    <div class="card">
-        <div class="search">
-            <input id="searchbox" type="text" placeholder="Search for a city..." spellcheck="false">
-            <button><img src="./images/search.png"></button>
-        </div>
-        <div class="error">
-            <p>Invalid city name</p>
-        </div>
-        <div class="weather">
-            <img src="./images/rain.png" class="weather-icon">
-            <h1 class="temp">22°C</h1>
-            <h2 class="city">New York</h2>
-            <h4 id="description">New York</h4>
-            <div class="details">
-                <div class="col">
-                    <img src="./images/humidity.png">
-                    <div>
-                        <p class="humidity">60%</p>
-                        <p>Humidity</p>
-                    </div>
-                </div>
+        <!-- Header & Search -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
+            <h1 class="text-3xl font-bold tracking-wide"><i class="fa-solid fa-cloud-sun text-yellow-400 mr-2"></i> Weather<span class="font-light">Pro</span></h1>
+            
+            <div class="search-container flex w-full md:w-auto bg-white/10 rounded-full px-4 py-2 transition-all duration-300 border border-white/20">
+                <input type="text" id="cityInput" placeholder="Enter city (e.g., Delhi)..." class="bg-transparent border-none outline-none text-white placeholder-gray-300 w-full md:w-64 h-10 px-2">
+                
+                <!-- Location Button -->
+                <button onclick="getGeoLocation()" class="text-white hover:text-green-400 transition-colors px-2 border-r border-white/20 mr-2 pr-3" title="Use Current Location">
+                    <i class="fa-solid fa-location-crosshairs text-lg"></i>
+                </button>
 
-                <div class="col">
-                    <img src="./images/wind.png">
-                    <div>
-                        <p class="wind">10 km/h</p>
-                        <p>Wind Speed</p>
-                    </div>
-                </div>
+                <button onclick="getWeather()" class="text-white hover:text-yellow-400 transition-colors px-2">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </button>
             </div>
         </div>
+
+        <!-- API Key Warning (Visible if no key) -->
+        <div id="apiKeyWarning" class="hidden bg-red-500/80 text-white p-3 rounded-lg mb-4 text-center">
+            ⚠️ Please add your WeatherAPI Key in the code (Line ~170).
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden bg-red-500/50 text-white p-4 rounded-xl text-center mb-6 border border-red-400">
+            City not found. Please try again.
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="hidden flex justify-center items-center py-20">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Weather Content -->
+        <div id="weatherContent" class="hidden relative z-10 fade-in">
+            
+            <!-- Current Weather Main -->
+            <div class="flex flex-col md:flex-row items-center justify-between mb-10">
+                <div class="text-center md:text-left mb-6 md:mb-0">
+                    <h2 id="cityName" class="text-4xl font-bold mb-1">New Delhi</h2>
+                    <p id="currentDate" class="text-gray-300 text-sm">Monday, 10 Oct</p>
+                    
+                    <div class="flex items-center justify-center md:justify-start mt-4">
+                        <img id="weatherIcon" src="" alt="Weather Icon" class="w-24 h-24 drop-shadow-lg">
+                        <div class="ml-2">
+                            <span id="temperature" class="text-7xl font-bold">28°</span>
+                            <div id="condition" class="text-xl text-gray-200">Mist</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts Section -->
+                <div id="alertBox" class="hidden w-full md:w-1/3 bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-sm">
+                    <div class="flex items-center text-red-300 font-bold mb-1">
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i> Weather Alert
+                    </div>
+                    <p id="alertText" class="text-gray-100 line-clamp-3">Heavy rain expected.</p>
+                </div>
+            </div>
+
+            <!-- Grid Details (AQI, Wind, etc) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <!-- Humidity -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-droplet text-blue-300 text-2xl mb-2"></i>
+                    <span class="text-gray-300 text-xs uppercase tracking-wider">Humidity</span>
+                    <span id="humidity" class="text-xl font-semibold">60%</span>
+                </div>
+
+                <!-- Wind -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-wind text-green-300 text-2xl mb-2"></i>
+                    <span class="text-gray-300 text-xs uppercase tracking-wider">Wind Speed</span>
+                    <span id="windSpeed" class="text-xl font-semibold">12 km/h</span>
+                </div>
+
+                <!-- AQI -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center relative group">
+                    <i class="fa-solid fa-lungs text-pink-300 text-2xl mb-2"></i>
+                    <span class="text-gray-300 text-xs uppercase tracking-wider">AQI Level</span>
+                    <span id="aqi" class="text-xl font-semibold">120</span>
+                    <div id="aqiText" class="text-xs text-yellow-300">Moderate</div>
+                </div>
+
+                <!-- UV Index -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-sun text-orange-300 text-2xl mb-2"></i>
+                    <span class="text-gray-300 text-xs uppercase tracking-wider">UV Index</span>
+                    <span id="uvIndex" class="text-xl font-semibold">5</span>
+                </div>
+            </div>
+
+            <!-- 3 Day Forecast -->
+            <div>
+                <h3 class="text-xl font-semibold mb-4 border-b border-white/10 pb-2">3-Day Forecast</h3>
+                <div id="forecastContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Forecast items will be injected here via JS -->
+                </div>
+            </div>
+
+        </div>
     </div>
-    
+
     <script src="index.js"></script>
-    <!-- <script src="ch.js"></script> -->
-
 </body>
-
 </html>
