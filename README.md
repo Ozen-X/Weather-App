@@ -2,7 +2,7 @@
 
 A modern, responsive weather application built with Vanilla JavaScript and Tailwind CSS. It features a stunning Glassmorphism UI and integrates with WeatherAPI to provide real-time weather data, 3-day forecasts, Air Quality Index (AQI), and severe weather alerts.
 
-(Note: Add a screenshot of your app here named https://www.google.com/search?q=screenshot.png)
+(Note: Add a screenshot of your app here named https://res.cloudinary.com/domy6ek0c/image/upload/v1764439778/o4ackuexpmjk30nb515j.png)
 
 ✨ Key Features
 
